@@ -48,26 +48,97 @@ public:
 
 class ConcreteLeaderboard : public Leaderboard {
 private:
-    // TODO: Define your skip list node structure and necessary variables
-    // Hint: You'll need nodes with multiple forward pointers
+    int Max_Level = 16; // Maximum level for skip list
+    float P = 0.5; // Probability for random level generation
+
+    Node* head; // Head node for each level in the skip list
+    int currentLevel; // Current highest level in the skip list
+
+    int randomLevel() {
+        int lvl = 0;
+        while (((float)rand() / RAND_MAX) < P && lvl < Max_Level)
+            lvl++;
+        return lvl;
+    }
 
 public:
     ConcreteLeaderboard() {
-        // TODO: Initialize your skip list
+        currentLevel = 0;
+        head = new Node(-1, INT_MAX, Max_Level); // Dummy head node has -1 ID beause is not a real player with max score to be in front always
     }
 
+    
     void addScore(int playerID, int score) override {
-        // TODO: Implement skip list insertion
-        // Remember to maintain descending order by score
+        vector<Node*> update(Max_Level + 1, nullptr);
+        Node* curr = head;
+
+        // search position (descending order by score)
+        for (int lvl = currentLevel; lvl >= 0; lvl--) { // loop through levels from top to bottom
+            // continue moving forward while new node's score is less than current node's score and it's ID is greater (to maintain order)
+            while (curr->forward[lvl] &&(curr->forward[lvl]->score >= score && curr->forward[lvl]->playerID < playerID)) curr = curr->forward[lvl];
+            update[lvl] = curr; // Keep track of last node at this level before the position that the new node will be inserted
+        }
+
+        curr = curr->forward[0]; // Move forward in level 0 to check if player already exists, curr is now the node after the position where new node would be inserted
+
+        // check first curr is not null and If player exists → update score (remove then insert again)
+        if (curr && curr->playerID == playerID) {
+            removePlayer(playerID);
+        }
+
+        int newLevel = randomLevel(); // Generate random level for new node
+
+        if (newLevel > currentLevel) {
+            for (int i = currentLevel + 1; i <= newLevel; i++)
+                update[i] = head;
+            currentLevel = newLevel;
+        }
+
+        Node* newNode = new Node(playerID, score, newLevel);
+
+        for (int i = 0; i <= newLevel; i++) {
+            newNode->forward[i] = update[i]->forward[i]; // Link new node to next node at level i
+            update[i]->forward[i] = newNode; // Link previous node to new node at level i
+        }
     }
+
 
     void removePlayer(int playerID) override {
-        // TODO: Implement skip list deletion
+        vector<Node*> update(Max_Level + 1, nullptr);
+        Node* curr = head;
+
+        // Find node
+        for (int lvl = currentLevel; lvl >= 0; lvl--) {
+            while (curr->forward[lvl] && curr->forward[lvl]->playerID < playerID) curr = curr->forward[lvl];
+            update[lvl] = curr;
+        }
+
+        curr = curr->forward[0];
+
+        if (curr && curr->playerID == playerID) {
+            for (int i = 0; i <= currentLevel; i++) {
+                if (update[i]->forward[i] != curr) break;
+                update[i]->forward[i] = curr->forward[i];
+            }
+
+            delete curr;
+
+            while (currentLevel > 0 && head->forward[currentLevel] == nullptr)
+                currentLevel--;
+        }
     }
 
+
     vector<int> getTopN(int n) override {
-        // TODO: Return top N player IDs in descending score order
-        return {};
+        vector<int> result;
+        Node* curr = head->forward[0]; // First node in level 0
+
+        while (curr && n--) {
+            result.push_back(curr->playerID);
+            curr = curr->forward[0];
+        }
+
+        return result;
     }
 };
 
@@ -106,10 +177,40 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
 }
 
 int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
-    // TODO: Implement 0/1 Knapsack using DP
-    // items = {weight, value} pairs
-    // Return maximum value achievable within capacity
-    return 0;
+    int size_items = items.size();
+    vector<vector<int>> V(size_items + 1, vector<int>(capacity + 1, 0)); // DP table
+    vector<vector<int>> P(size_items + 1, vector<int>(capacity + 1, 0)); // To track selected items
+
+    // Fill DP table
+    for (int i = 1; i <= size_items; i++) {  // i is item index
+        int weight = items[i-1].first;
+        int value = items[i-1].second;
+        for (int j = 1; j <= capacity; j++) {  // j is current capacity
+            if (weight <= j && value + V[i-1][j - weight] > V[i-1][j]) {
+                V[i][j] = value + V[i-1][j - weight];
+                P[i][j] = j - weight;
+            } else {
+                V[i][j] = V[i-1][j];
+                P[i][j] = j;
+            }
+        }
+    }
+
+    // Backtracking to print selected items
+    int j = capacity;
+    vector<int> selectedItems;
+    for (int i = size_items; i >= 1; i--) {
+        if (P[i][j] != j) { // item i-1 was included
+            selectedItems.push_back(i-1);
+            j = P[i][j];
+        }
+    }
+
+    cout << "Selected item num: ";
+    for (int num : selectedItems) cout << num + 1 << " ";
+    cout << endl;
+
+    return V[size_items][capacity];
 }
 
 long long InventorySystem::countStringPossibilities(string s) {
