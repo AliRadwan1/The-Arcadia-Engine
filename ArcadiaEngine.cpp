@@ -113,21 +113,57 @@ int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& it
 }
 
 long long InventorySystem::countStringPossibilities(string s) {
-    // TODO: Implement string decoding DP
-    // Rules: "uu" can be decoded as "w" or "uu"
-    //        "nn" can be decoded as "m" or "nn"
-    // Count total possible decodings
-    return 0;
+    if (s.size() < 2)
+        return 1;
+    long long dp1=1,dp2=1,current=1;
+    for (int i = 1; i < s.size(); i++)
+    {
+        current = dp1;
+        if (s[i] == s[i - 1] && (s[i] == 'u' || s[i] == 'n'))
+        {
+            current = (current + dp2);
+        }
+        dp2 = dp1;
+        dp1 = current;
+    }
+    return current;
 }
 
 // =========================================================
 // PART C: WORLD NAVIGATOR (Graphs)
 // =========================================================
-
-bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
-    // TODO: Implement path existence check using BFS or DFS
-    // edges are bidirectional
+bool dfs(int start, vector<bool> &visited, vector<vector<int>> &adj, int dest)
+{
+    visited[start] = true;
+    if (start == dest)
+        return true;
+    for (int i = 0; i < adj[start].size(); i++)
+    {
+        if (adj[start][i] == 1 && (!visited[i]))
+        {
+            if (dfs(i, visited, adj, dest))
+                return true;
+        }
+    }
     return false;
+}
+bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
+    vector<bool> visited(n, false);
+    edges = vector<vector<int>>(n, vector<int>(n, 0));
+    cout << "Enter number of edges: ";
+    cin >> n;
+    int s, d;
+    for (int i = 0; i < n; ++i)
+    {
+        cout << "Edge source: ";
+        cin >> s;
+        cout << "Edge destination: ";
+        cin >> d;
+        edges[s][d] = 1;
+    }
+    cout << "----------------------------------------" << endl;
+    cout << "DFS Traversal: ";
+    return dfs(source, visited, edges, dest);
 }
 
 long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long long silverRate,
