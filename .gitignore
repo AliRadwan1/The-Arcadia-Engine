@@ -39,3 +39,8 @@
 
 # debug information files
 *.dwo
+
+# ignore everything in ArcediaEngine file except source and headers
+ArcediaEngine/*
+!ArcediaEngine/*.cpp
+!ArcediaEngine/*.h
