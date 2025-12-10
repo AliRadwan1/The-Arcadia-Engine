@@ -1,4 +1,4 @@
-Team Name: The Arcadia Engine Team
+Team Name: 
 
 Member 1:
 Name: Ali Radwan Farouk
@@ -16,6 +16,6 @@ Member 4:
 Name: Mostafa Sobhy
 Student ID: 20230401
 
-Member 5: (if applicable)
+Member 5:
 Name: Beshr Sofi
 Student ID: 20230717
