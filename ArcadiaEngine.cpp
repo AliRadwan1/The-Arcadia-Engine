@@ -46,6 +46,14 @@ public:
 
 // --- 2. Leaderboard (Skip List) ---
 
+struct Node {
+    int playerID;
+    int score;
+    vector<Node*> forward; // forward pointers for each level
+
+    Node(int id, int s, int level) : playerID(id), score(s), forward(level + 1, nullptr) {}
+};
+
 class ConcreteLeaderboard : public Leaderboard {
 private:
     int Max_Level = 16; // Maximum level for skip list
