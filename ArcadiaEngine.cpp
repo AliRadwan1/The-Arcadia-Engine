@@ -275,13 +275,97 @@ bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, i
     return dfs(source, visited, edges, dest);
 }
 
+void sort_edges(vector<vector<long long>>& edges)
+{
+    // sort => O(NlogN) == O(ElogE)
+    sort(edges.begin(), edges.end(),
+        [](const vector<long long>& a, vector<long long>& b) {
+            return a[2] < b[2]; // Comparisson by cost
+        }
+    );
+}
+
+// Helper function to check which group a vertex belongs to
+int find_group(int i, vector<int>& parent)
+{
+//    while (true)
+//    {
+//        if (parent[i] == i)
+//        {
+//            parent[p] = i;
+//            break;
+//        }
+//        i = parent[i];
+//    }
+    
+    /*
+        implementing using the idea of Path Comparison
+
+        the idea is to save steps when checking for the group
+        for example if 0 -> 1 -> 2 -> 4
+        instead of each time taking 3 setps when checkin for node 0
+        we save the last value so we only take one step
+        0 -> 4
+
+        average Time = O(1)
+    */
+    
+    if (parent[i] == i)
+    {
+        return i;
+    }
+    // Path comparison: Points directly to the root
+    parent[i] = find_group(parent[i], parent);
+
+    return parent[i];
+}
+
+// Implemented using Kruskal's algorithm
 long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long long silverRate,
                                        vector<vector<int>>& roadData) {
-    // TODO: Implement Minimum Spanning Tree (Kruskal's or Prim's)
-    // roadData[i] = {u, v, goldCost, silverCost}
-    // Total cost = goldCost * goldRate + silverCost * silverRate
+    // n (Nodes/Vertices): number of distinct locations "Cities"
+    // m (Edges): number of availabel roads connecting those 
+    // Total cost per road (Edge) = goldCost * goldRate + silverCost * silverRate
     // Return -1 if graph cannot be fully connected
-    return -1;
+
+    // 1. Convert inputs to edges with calculate weights
+    vector<vector<long long>> edges;
+    for (vector<int>& r : roadData)
+    {
+        long long cost = (r[2] * goldRate) + (r[3] * silverRate);
+        edges.push_back({ r[0],r[1],cost });
+    }
+
+    // 2. Sort edges by cost (Cheapest first)
+    sort_edges(edges);
+
+    // 3. Initialize Union-Find (Disjoint Set)
+    // same idea of makeing number of v sets then union them
+    vector<int> parent(n);
+    iota(parent.begin(), parent.end(), 0); // fill parent with sequentially increasing values (equal to loop)
+    
+    // 4. Calculate the minimum cost
+    long long total_cost = 0;
+    int MST_edges = 0;
+
+    for (vector<long long>& e : edges)
+    {
+        int u = (int)e[0], v = (int)e[1];
+        long long c = e[2];
+
+        int rootU = find_group(u, parent);
+        int rootV = find_group(v, parent);
+
+        // Checking if u and v are not in the same group to prevent cycling
+        if (rootU != rootV)
+        {
+            total_cost += c;
+            parent[rootU] = rootV; // Union operation
+            MST_edges++;
+        }
+    }
+    // The minimum number of edges required to be fully connected is (V - 1)
+    return (MST_edges < n - 1) ? -1 : total_cost;
 }
 
 string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) {
