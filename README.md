@@ -89,7 +89,7 @@ The-Arcadia-Engine/
 | Knapsack       | 0/1 DP                                       | O(n × W)           |
 | String DP      | Linear transitions                           | O(n)               |
 | Path Existence | BFS/DFS                                      | O(V + E)           |
-| MST            | Kruskal or Prim                              | O(E log V)         |
+| MST            | Kruskal                                      | O(E log V)         |
 | APSP           | Floyd–Warshall                               | O(V³)              |
 | Scheduler      | Greedy max-frequency                         | O(n) or O(n log n) |
 
