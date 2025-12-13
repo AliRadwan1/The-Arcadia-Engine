@@ -367,13 +367,92 @@ long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long lo
     // The minimum number of edges required to be fully connected is (V - 1)
     return (MST_edges < n - 1) ? -1 : total_cost;
 }
+// =============================================================================================
+// Initializes the Distance matrix
+void initialize_distance_matrix(vector<vector<long long>>& D, const vector<vector<int>>& roads)
+{
+    // initialize distance matrix with all values set to INFINITY
+    for (int i = 0; i < D.size(); i++)
+    {
+        for (int j = 0; j < D.size(); j++)
+        {
+            D[i][j] = LLONG_MAX;
+        }
+    }
 
+    for (int i = 0; i < D.size(); i++) { D[i][i] = 0; } // each city to itself is 0 distance
+
+    // assign the values for each road(edge) between the cities(vertices)
+    for (vector<int> r : roads)
+    {
+        int u = r[0], v = r[1], d = r[2];
+        D[u][v] = d;
+    }
+}
+// Floyd-Warshall algorithm
+void floydWarshall(vector<vector<long long>>& D)
+{
+    int v = D.size();
+
+    // Loop over all the intermediate vertices 
+    for (int k = 0; k < v; k++)
+    {
+        // Pick each city(vertices) as the source
+        for (int i = 0; i < v; i++)
+        {
+            // Pick each city(vertices) as the distination for all the picked sources
+            for (int j = 0; j < v; j++)
+            {
+                if (D[i][k] != LLONG_MAX && D[k][j] != LLONG_MAX) // K is intermediate between i & j
+                {
+                    D[i][j] = min(D[i][j], D[i][k] + D[k][j]);
+                }
+            }
+        }
+    }
+}
+// Helper function to convert the result to binary representation
+string decToBinary(long long sum)
+{
+    string bin = "";
+
+    while (sum > 0)
+    {
+        int bit = sum % 2;
+        bin.push_back('0' + bit);
+        sum /= 2;
+    }
+    reverse(bin.begin(), bin.end());
+
+    return bin;
+}
+// Implemented using Floyd-Warshall algorithm
 string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) {
-    // TODO: Implement All-Pairs Shortest Path (Floyd-Warshall)
     // Sum all shortest distances between unique pairs (i < j)
+
+    vector<vector<long long>> D(n, vector<long long>(n)); // Distance matrix
+
+    initialize_distance_matrix(D, roads);
+
+    floydWarshall(D);
+
+    // Calculate the sum
+    long long sum = 0;
+    for (int i = 0; i < D.size(); i++)
+    {
+        for (int j = i + 1; j < D.size(); j++)
+        {
+            if (D[i][j] != LLONG_MAX) // if the two cities are connected through a path
+            {
+                sum += D[i][j];
+            }
+        }
+    }
+
     // Return the sum as a binary string
-    // Hint: Handle large numbers carefully
-    return "0";
+    string result = (sum != 0) ? decToBinary(sum) : "0";
+
+    return result;
 }
 
 // =========================================================
