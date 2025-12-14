@@ -21,28 +21,53 @@ using namespace std;
 // =========================================================
 
 // --- 1. PlayerTable (Double Hashing) ---
-
 class ConcretePlayerTable : public PlayerTable {
 private:
-    // TODO: Define your data structures here
-    // Hint: You'll need a hash table with double hashing collision resolution
+    struct Player
+    {
+        int playerID;
+        string name;
+        bool busy; // To handle busy entries in open addressing
+
+        Player(int id = -1, string n = "", bool del = false){
+            playerID=id; name=n; busy=del; 
+        }
+    };
+
+    Player table[101];
 
 public:
-    ConcretePlayerTable() {
-        // TODO: Initialize your hash table
-    }
-
     void insert(int playerID, string name) override {
-        // TODO: Implement double hashing insert
-        // Remember to handle collisions using h1(key) + i * h2(key)
+        int hash1 = playerID % 101;
+        int hash2 = 97 - (playerID % 97);
+        if(hash2 == 0) hash2 = 1;
+        for(int i = 0; i < 101; i++){
+            int index = (hash1 + (long long)i * hash2) % 101;
+            if(!table[index].busy){
+                table[index] = Player(playerID, name, true);
+                return;
+            }
+        }
+        cout << "Hash Table Full, cannot insert player " << playerID << endl;
     }
 
     string search(int playerID) override {
-        // TODO: Implement double hashing search
-        // Return "" if player not found
+        int hash1 = playerID % 101;
+        int hash2 = 97 - (playerID % 97);
+        if(hash2 == 0) hash2 = 1;
+        for(int i = 0; i < 101; i++){
+            int index = (hash1 + (long long)i * hash2) % 101;
+            if(table[index].busy && table[index].playerID == playerID){
+                return table[index].name;
+            }
+            if(!table[index].busy){
+                return "Not Found";
+            }
+        }
         return "";
     }
 };
+
 
 // --- 2. Leaderboard (Skip List) ---
 
@@ -311,7 +336,31 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // TODO: Implement partition problem using DP
     // Goal: Minimize |sum(subset1) - sum(subset2)|
     // Hint: Use subset sum DP to find closest sum to total/2
-    return 0;
+    int sum = accumulate(coins.begin(), coins.end(), 0); // Total sum of coins
+    int mid = sum / 2; 
+    vector<bool> arr(mid + 1, false); // intialize array of bool values wit size mid+1 with false
+    // if we can make sum j with subset of coins dp[j] = true
+    arr[0] = true;  
+
+    for (int coin : coins) {
+        // from a mid decreasing to coin to avoid recomputation
+        for (int j = mid; j >= coin; j--) {
+            if (arr[j - coin]) {
+                arr[j] = true;
+            }
+        }
+    }
+
+    // find the closest sum to mid
+    int closest = 0;
+    for (int j = mid; j >= 0; j--) {
+        if (arr[j]) {
+            closest = j;
+            break;
+        }
+    }
+
+    return sum - 2 * closest;
 }
 
 int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
@@ -497,13 +546,92 @@ long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long lo
     // The minimum number of edges required to be fully connected is (V - 1)
     return (MST_edges < n - 1) ? -1 : total_cost;
 }
+// =============================================================================================
+// Initializes the Distance matrix
+void initialize_distance_matrix(vector<vector<long long>>& D, const vector<vector<int>>& roads)
+{
+    // initialize distance matrix with all values set to INFINITY
+    for (int i = 0; i < D.size(); i++)
+    {
+        for (int j = 0; j < D.size(); j++)
+        {
+            D[i][j] = LLONG_MAX;
+        }
+    }
 
+    for (int i = 0; i < D.size(); i++) { D[i][i] = 0; } // each city to itself is 0 distance
+
+    // assign the values for each road(edge) between the cities(vertices)
+    for (vector<int> r : roads)
+    {
+        int u = r[0], v = r[1], d = r[2];
+        D[u][v] = d;
+    }
+}
+// Floyd-Warshall algorithm
+void floydWarshall(vector<vector<long long>>& D)
+{
+    int v = D.size();
+
+    // Loop over all the intermediate vertices 
+    for (int k = 0; k < v; k++)
+    {
+        // Pick each city(vertices) as the source
+        for (int i = 0; i < v; i++)
+        {
+            // Pick each city(vertices) as the distination for all the picked sources
+            for (int j = 0; j < v; j++)
+            {
+                if (D[i][k] != LLONG_MAX && D[k][j] != LLONG_MAX) // K is intermediate between i & j
+                {
+                    D[i][j] = min(D[i][j], D[i][k] + D[k][j]);
+                }
+            }
+        }
+    }
+}
+// Helper function to convert the result to binary representation
+string decToBinary(long long sum)
+{
+    string bin = "";
+
+    while (sum > 0)
+    {
+        int bit = sum % 2;
+        bin.push_back('0' + bit);
+        sum /= 2;
+    }
+    reverse(bin.begin(), bin.end());
+
+    return bin;
+}
+// Implemented using Floyd-Warshall algorithm
 string WorldNavigator::sumMinDistancesBinary(int n, vector<vector<int>>& roads) {
-    // TODO: Implement All-Pairs Shortest Path (Floyd-Warshall)
     // Sum all shortest distances between unique pairs (i < j)
+
+    vector<vector<long long>> D(n, vector<long long>(n)); // Distance matrix
+
+    initialize_distance_matrix(D, roads);
+
+    floydWarshall(D);
+
+    // Calculate the sum
+    long long sum = 0;
+    for (int i = 0; i < D.size(); i++)
+    {
+        for (int j = i + 1; j < D.size(); j++)
+        {
+            if (D[i][j] != LLONG_MAX) // if the two cities are connected through a path
+            {
+                sum += D[i][j];
+            }
+        }
+    }
+
     // Return the sum as a binary string
-    // Hint: Handle large numbers carefully
-    return "0";
+    string result = (sum != 0) ? decToBinary(sum) : "0";
+
+    return result;
 }
 
 // =========================================================
