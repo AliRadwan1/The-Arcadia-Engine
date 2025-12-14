@@ -208,15 +208,15 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // Hint: Use subset sum DP to find closest sum to total/2
     int sum = accumulate(coins.begin(), coins.end(), 0); // Total sum of coins
     int mid = sum / 2; 
-    vector<bool> dp(mid + 1, false); // intialize array of bool values wit size mid+1 with false
+    vector<bool> arr(mid + 1, false); // intialize array of bool values wit size mid+1 with false
     // if we can make sum j with subset of coins dp[j] = true
-    dp[0] = true;  
+    arr[0] = true;  
 
     for (int coin : coins) {
         // from a mid decreasing to coin to avoid recomputation
         for (int j = mid; j >= coin; j--) {
-            if (dp[j - coin]) {
-                dp[j] = true;
+            if (arr[j - coin]) {
+                arr[j] = true;
             }
         }
     }
@@ -224,13 +224,12 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // find the closest sum to mid
     int closest = 0;
     for (int j = mid; j >= 0; j--) {
-        if (dp[j]) {
+        if (arr[j]) {
             closest = j;
             break;
         }
     }
 
-    
     return sum - 2 * closest;
 }
 
