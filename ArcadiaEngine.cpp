@@ -21,28 +21,53 @@ using namespace std;
 // =========================================================
 
 // --- 1. PlayerTable (Double Hashing) ---
-
 class ConcretePlayerTable : public PlayerTable {
 private:
-    // TODO: Define your data structures here
-    // Hint: You'll need a hash table with double hashing collision resolution
+    struct Player
+    {
+        int playerID;
+        string name;
+        bool busy; // To handle busy entries in open addressing
+
+        Player(int id = -1, string n = "", bool del = false){
+            playerID=id; name=n; busy=del; 
+        }
+    };
+
+    Player table[101];
 
 public:
-    ConcretePlayerTable() {
-        // TODO: Initialize your hash table
-    }
-
     void insert(int playerID, string name) override {
-        // TODO: Implement double hashing insert
-        // Remember to handle collisions using h1(key) + i * h2(key)
+        int hash1 = playerID % 101;
+        int hash2 = 97 - (playerID % 97);
+        if(hash2 == 0) hash2 = 1;
+        for(int i = 0; i < 101; i++){
+            int index = (hash1 + (long long)i * hash2) % 101;
+            if(!table[index].busy){
+                table[index] = Player(playerID, name, true);
+                return;
+            }
+        }
+        cout << "Hash Table Full, cannot insert player " << playerID << endl;
     }
 
     string search(int playerID) override {
-        // TODO: Implement double hashing search
-        // Return "" if player not found
+        int hash1 = playerID % 101;
+        int hash2 = 97 - (playerID % 97);
+        if(hash2 == 0) hash2 = 1;
+        for(int i = 0; i < 101; i++){
+            int index = (hash1 + (long long)i * hash2) % 101;
+            if(table[index].busy && table[index].playerID == playerID){
+                return table[index].name;
+            }
+            if(!table[index].busy){
+                return "Not Found";
+            }
+        }
         return "";
     }
 };
+
 
 // --- 2. Leaderboard (Skip List) ---
 
@@ -181,7 +206,32 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // TODO: Implement partition problem using DP
     // Goal: Minimize |sum(subset1) - sum(subset2)|
     // Hint: Use subset sum DP to find closest sum to total/2
-    return 0;
+    int sum = accumulate(coins.begin(), coins.end(), 0); // Total sum of coins
+    int mid = sum / 2; 
+    vector<bool> dp(mid + 1, false); // intialize array of bool values wit size mid+1 with false
+    // if we can make sum j with subset of coins dp[j] = true
+    dp[0] = true;  
+
+    for (int coin : coins) {
+        // from a mid decreasing to coin to avoid recomputation
+        for (int j = mid; j >= coin; j--) {
+            if (dp[j - coin]) {
+                dp[j] = true;
+            }
+        }
+    }
+
+    // find the closest sum to mid
+    int closest = 0;
+    for (int j = mid; j >= 0; j--) {
+        if (dp[j]) {
+            closest = j;
+            break;
+        }
+    }
+
+    
+    return sum - 2 * closest;
 }
 
 int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
