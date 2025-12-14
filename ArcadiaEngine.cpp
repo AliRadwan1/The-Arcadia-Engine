@@ -156,16 +156,146 @@ class ConcreteAuctionTree : public AuctionTree {
 private:
     // TODO: Define your Red-Black Tree node structure
     // Hint: Each node needs: id, price, color, left, right, parent pointers
+    struct RBNode {
+        int id;
+        int price;
+        char color; // 'R' or 'B'
+        RBNode *left, *right, *parent;
+        RBNode(int id, int p) : id(id), price(p), color('R'), left(nullptr), right(nullptr), parent(nullptr) {}
+    };
+
+    RBNode* root;
+
+    // helper function: Left Rotation
+    void rotateLeft(RBNode*& node)
+    {
+        RBNode* child = node->right;
+        node->right = child->left;
+        if (node->right != nullptr)
+            node->right->parent = node;
+        child->parent = node->parent;
+        if (node->parent == nullptr)
+            root = child;
+        else if (node == node->parent->left)
+            node->parent->left = child;
+        else
+            node->parent->right = child;
+        child->left = node;
+        node->parent = child;
+    }
+
+    // helper function: Right Rotation
+    void rotateRight(RBNode*& node)
+    {
+        RBNode* child = node->left;
+        node->left = child->right;
+        if (node->left != nullptr)
+            node->left->parent = node;
+        child->parent = node->parent;
+        if (node->parent == nullptr)
+            root = child;
+        else if (node == node->parent->left)
+            node->parent->left = child;
+        else
+            node->parent->right = child;
+        child->right = node;
+        node->parent = child;
+    }
 
 public:
     ConcreteAuctionTree() {
         // TODO: Initialize your Red-Black Tree
+        root = nullptr;
+        root->color = 'B'; // root must be always black
     }
 
     void insertItem(int itemID, int price) override {
         // TODO: Implement Red-Black Tree insertion
         // Remember to maintain RB-Tree properties with rotations and recoloring
-    }
+        RBNode* newNode = new RBNode(itemID,price);
+        RBNode* current = root;
+        RBNode* parent = nullptr;
+
+        while (current != nullptr){
+            parent = current;
+            if (newNode->price < current->price){
+                current = current->left;
+            }
+            else{
+                current = current->right;
+            }
+        }
+
+        newNode->parent = parent;
+
+        if (parent == nullptr){
+            root = newNode;
+        }
+        else if (newNode->price < parent->price){
+            parent->left = newNode;
+        }
+        else{
+            parent->right = newNode;
+        }
+
+        if (newNode->parent == nullptr){ //case 0 : new node is root
+            newNode->color = 'B';
+            return;
+        }
+
+        else if (newNode->parent->color == 'B'){ //case 1 : parent is black doesn't violate any rules
+            return;
+        }
+
+        //fixing loop
+        RBNode* p = nullptr;
+        RBNode* g = nullptr;
+        while (newNode != root && newNode->color == 'R' && newNode->parent->color == 'R') {
+            p = newNode->parent ;
+            g = p->parent;
+            if(p == g->left){ // if newNode's parent is the left child of its parent
+                RBNode* unc = g->right;
+                if(unc != nullptr && unc->color == 'R'){ //case 2: parent is red & uncle is red
+                    p->color = 'B';
+                    unc->color = 'B';
+                    g->color = 'R';
+                    newNode = g;
+                }
+                else{ //case 3: parent is red but uncle is black
+                    if (newNode == p->right) {
+                        rotateLeft(p);
+                        newNode = p;
+                        p = newNode->parent;
+                    }
+                    rotateRight(g);
+                    p->color = 'B';
+                    g->color = 'R';
+                    newNode = p;
+                }
+            }
+            else{
+                RBNode* unc = g->left;
+                if(unc != nullptr && unc->color == 'R'){ //case 2: parent is red & uncle is red
+                    p->color = 'B';
+                    unc->color = 'B';
+                    g->color = 'R';
+                    newNode = g;
+                }
+                else{ //case 3: parent is red but uncle is black
+                    if (newNode == p->right) {
+                        rotateRight(p);
+                        newNode = p;
+                        p = newNode->parent;
+                    }
+                    rotateLeft(g);
+                    p->color = 'B';
+                    g->color = 'R';
+                    newNode = p;
+                }
+            }
+            root->color = 'B';
+ }
+}
 
     void deleteItem(int itemID) override {
         // TODO: Implement Red-Black Tree deletion
