@@ -31,7 +31,7 @@ private:
         bool busy; // To handle busy entries in open addressing
 
         Player(int id = -1, string n = "", bool del = false){
-            playerID=id; name=n; busy=del; 
+            playerID=id; name=n; busy=del;
         }
     };
 
@@ -101,7 +101,7 @@ public:
         head = new Node(-1, INT_MAX, Max_Level); // Dummy head node has -1 ID beause is not a real player with max score to be in front always
     }
 
-    
+
     void addScore(int playerID, int score) override {
         vector<Node*> update(Max_Level + 1, nullptr);
         Node* curr = head;
@@ -244,100 +244,100 @@ private:
 
 
     void FixTree(RBNode* x, RBNode* parent) {
-    while (x != root && (x == nullptr || x->color == 'B')) {
-        if (parent == nullptr)
-            break;
+        while (x != root && (x == nullptr || x->color == 'B')) {
+            if (parent == nullptr)
+                break;
 
 
-        if (x == parent->left) {
-            RBNode* sib = parent->right;
+            if (x == parent->left) {
+                RBNode* sib = parent->right;
 
-            // Case 1: sibling is red
-            if (sib != nullptr && sib->color == 'R') {
-                sib->color = 'B';
-                parent->color = 'R';
-                rotateLeft(parent);
-                sib = parent->right;
-            }
-
-            // Case 2: sibling black, both children black
-            if (sib == nullptr ||
-                ((sib->left == nullptr || sib->left->color == 'B') &&
-                 (sib->right == nullptr || sib->right->color == 'B'))) {
-
-                if (sib != nullptr)
-                    sib->color = 'R';
-
-                x = parent;
-                parent = x->parent;
-            }
-            else {
-                // Case 3: sibling black, near child red, far child black
-                if (sib->right == nullptr || sib->right->color == 'B') {
-                    if (sib->left != nullptr)
-                        sib->left->color = 'B';
-                    sib->color = 'R';
-                    rotateRight(sib);
+                // Case 1: sibling is red
+                if (sib != nullptr && sib->color == 'R') {
+                    sib->color = 'B';
+                    parent->color = 'R';
+                    rotateLeft(parent);
                     sib = parent->right;
                 }
 
-                // Case 4: sibling black, far child red
-                sib->color = parent->color;
-                parent->color = 'B';
-                if (sib->right != nullptr)
-                    sib->right->color = 'B';
+                // Case 2: sibling black, both children black
+                if (sib == nullptr ||
+                    ((sib->left == nullptr || sib->left->color == 'B') &&
+                     (sib->right == nullptr || sib->right->color == 'B'))) {
 
-                rotateLeft(parent);
-                break;
-            }
-        }
-        else {// same cases but mirrored
-            RBNode* sib = parent->left;
+                    if (sib != nullptr)
+                        sib->color = 'R';
 
-            if (sib != nullptr && sib->color == 'R') {
-                sib->color = 'B';
-                parent->color = 'R';
-                rotateRight(parent);
-                sib = parent->left;
-            }
+                    x = parent;
+                    parent = x->parent;
+                }
+                else {
+                    // Case 3: sibling black, near child red, far child black
+                    if (sib->right == nullptr || sib->right->color == 'B') {
+                        if (sib->left != nullptr)
+                            sib->left->color = 'B';
+                        sib->color = 'R';
+                        rotateRight(sib);
+                        sib = parent->right;
+                    }
 
-            if (sib == nullptr ||
-                ((sib->left == nullptr || sib->left->color == 'B') &&
-                 (sib->right == nullptr || sib->right->color == 'B'))) {
-
-                if (sib != nullptr)
-                    sib->color = 'R';
-
-                x = parent;
-                parent = x->parent;
-            }
-            else {
-                if (sib->left == nullptr || sib->left->color == 'B') {
+                    // Case 4: sibling black, far child red
+                    sib->color = parent->color;
+                    parent->color = 'B';
                     if (sib->right != nullptr)
                         sib->right->color = 'B';
-                    sib->color = 'R';
-                    rotateLeft(sib);
+
+                    rotateLeft(parent);
+                    break;
+                }
+            }
+            else {// same cases but mirrored
+                RBNode* sib = parent->left;
+
+                if (sib != nullptr && sib->color == 'R') {
+                    sib->color = 'B';
+                    parent->color = 'R';
+                    rotateRight(parent);
                     sib = parent->left;
                 }
 
-                sib->color = parent->color;
-                parent->color = 'B';
-                if (sib->left != nullptr)
-                    sib->left->color = 'B';
+                if (sib == nullptr ||
+                    ((sib->left == nullptr || sib->left->color == 'B') &&
+                     (sib->right == nullptr || sib->right->color == 'B'))) {
 
-                rotateRight(parent);
-                break;
+                    if (sib != nullptr)
+                        sib->color = 'R';
+
+                    x = parent;
+                    parent = x->parent;
+                }
+                else {
+                    if (sib->left == nullptr || sib->left->color == 'B') {
+                        if (sib->right != nullptr)
+                            sib->right->color = 'B';
+                        sib->color = 'R';
+                        rotateLeft(sib);
+                        sib = parent->left;
+                    }
+
+                    sib->color = parent->color;
+                    parent->color = 'B';
+                    if (sib->left != nullptr)
+                        sib->left->color = 'B';
+
+                    rotateRight(parent);
+                    break;
+                }
             }
         }
+
+        if (x != nullptr)
+            x->color = 'B';
+
+        if (root != nullptr)
+            root->color = 'B';
+
     }
-
-    if (x != nullptr)
-        x->color = 'B';
-        
-    if (root != nullptr)
-    root->color = 'B';
-
-}
 
 
 
@@ -432,7 +432,7 @@ public:
                     g->color = 'R';
                     newNode = p;
                 }
-            }          
+            }
         }
         root->color = 'B'; // ensure root is always black
     }
@@ -464,7 +464,7 @@ public:
             x = y->right;
         else
             x = y->left;
-        
+
         char yOriginalColor = y->color;
 
         if (y->parent == nullptr) { // y was the root
@@ -480,7 +480,7 @@ public:
 
         if (x != nullptr){
             x->parent = y->parent;}
-        
+
 
         if (yOriginalColor == 'B' && x != root) {
             FixTree(x, y->parent);
@@ -488,8 +488,8 @@ public:
 
         delete y;
 
-        }
-        
+    }
+
 };
 
 // =========================================================
@@ -501,13 +501,13 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
     // Goal: Minimize |sum(subset1) - sum(subset2)|
     // Hint: Use subset sum DP to find closest sum to total/2'
 
-	if (coins.empty()) return 0; // No coins, no difference
+    if (coins.empty()) return 0; // No coins, no difference
 
     int sum = accumulate(coins.begin(), coins.end(), 0); // Total sum of coins
-    int mid = sum / 2; 
+    int mid = sum / 2;
     vector<bool> arr(mid + 1, false); // intialize array of bool values wit size mid+1 with false
     // if we can make sum j with subset of coins dp[j] = true
-    arr[0] = true;  
+    arr[0] = true;
 
     for (int coin : coins) {
         // from a mid decreasing to coin to avoid recomputation
@@ -588,53 +588,38 @@ long long InventorySystem::countStringPossibilities(string s) {
 // PART C: WORLD NAVIGATOR (Graphs)
 // =========================================================
 
-bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
-    // Build adjacency list from the given edges
-    vector<vector<int>> adj(n);
-    for (auto& edge : edges) {
-        int u = edge[0];
-        int v = edge[1];
-        adj[u].push_back(v);
-        adj[v].push_back(u); // Assuming undirected graph
-    }
-
-    // Check if source or dest are out of bounds
-    if (source < 0 || source >= n || dest < 0 || dest >= n) {
-        return false;
-    }
-
-    // DFS using stack (iterative to avoid recursion depth issues)
-    vector<bool> visited(n, false);
-    stack<int> s;
-    s.push(source);
-    visited[source] = true;
-
-    while (!s.empty()) {
-        int current = s.top();
-        s.pop();
-
-        if (current == dest) {
-            return true;
-        }
-
-        for (int neighbor : adj[current]) {
-            if (!visited[neighbor]) {
-                visited[neighbor] = true;
-                s.push(neighbor);
-            }
+bool dfs(int start, vector<bool> &visited, vector<vector<int>> &adj, int dest)
+{
+    visited[start] = true;
+    if (start == dest)
+        return true;
+    for (int i = 0; i < adj[start].size(); i++)
+    {
+        if (adj[start][i] == 1 && (!visited[i]))
+        {
+            if (dfs(i, visited, adj, dest))
+                return true;
         }
     }
-
     return false;
+}
+bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
+    vector<bool> visited(n, false);
+    vector<vector<int>> tmp = vector<vector<int>>(n, vector<int>(n, 0));
+    for (int i = 0; i < edges.size(); ++i) {
+        tmp[edges[i][0]][edges[i][1]] = 1;
+    }
+
+    return dfs(source, visited, tmp, dest);
 }
 
 void sort_edges(vector<vector<long long>>& edges)
 {
     // sort => O(NlogN) == O(ElogE)
     sort(edges.begin(), edges.end(),
-        [](const vector<long long>& a, vector<long long>& b) {
-            return a[2] < b[2]; // Comparisson by cost
-        }
+         [](const vector<long long>& a, vector<long long>& b) {
+             return a[2] < b[2]; // Comparisson by cost
+         }
     );
 }
 
@@ -650,7 +635,7 @@ int find_group(int i, vector<int>& parent)
 //        }
 //        i = parent[i];
 //    }
-    
+
     /*
         implementing using the idea of Path Comparison
 
@@ -662,7 +647,7 @@ int find_group(int i, vector<int>& parent)
 
         average Time = O(1)
     */
-    
+
     if (parent[i] == i)
     {
         return i;
@@ -677,7 +662,7 @@ int find_group(int i, vector<int>& parent)
 long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long long silverRate,
                                        vector<vector<int>>& roadData) {
     // n (Nodes/Vertices): number of distinct locations "Cities"
-    // m (Edges): number of availabel roads connecting those 
+    // m (Edges): number of availabel roads connecting those
     // Total cost per road (Edge) = goldCost * goldRate + silverCost * silverRate
     // Return -1 if graph cannot be fully connected
 
@@ -696,7 +681,7 @@ long long WorldNavigator::minBribeCost(int n, int m, long long goldRate, long lo
     // same idea of makeing number of v sets then union them
     vector<int> parent(n);
     iota(parent.begin(), parent.end(), 0); // fill parent with sequentially increasing values (equal to loop)
-    
+
     // 4. Calculate the minimum cost
     long long total_cost = 0;
     int MST_edges = 0;
@@ -747,7 +732,7 @@ void floydWarshall(vector<vector<long long>>& D)
 {
     int v = D.size();
 
-    // Loop over all the intermediate vertices 
+    // Loop over all the intermediate vertices
     for (int k = 0; k < v; k++)
     {
         // Pick each city(vertices) as the source
@@ -817,45 +802,45 @@ int ServerKernel::minIntervals(vector<char>& tasks, int n) {
     // Same task must wait 'n' intervals before running again
     // Return minimum total intervals needed (including idle time)
     // Hint: Use greedy approach with frequency counting
-	if (tasks.empty()) 
+    if (tasks.empty())
         return 0;
 
 
-    vector<int> freq(26, 0); 
-	for (char task : tasks) { //O(26) = O(1)
+    vector<int> freq(26, 0);
+    for (char task : tasks) { //O(26) = O(1)
         freq[task - 'A']++;
     }
 
-	priority_queue<int> maxFreq; // max-heap to always get the task with highest remaining frequency
+    priority_queue<int> maxFreq; // max-heap to always get the task with highest remaining frequency
     for (int i = 0; i < 26; i++){ //O(26) = O(1)
         if (freq[i] > 0)
             maxFreq.push(freq[i]);
     }
 
 
-	queue<pair<int, int>> cooling; // a queue to hold tasks that need to cool down before they can be used again
+    queue<pair<int, int>> cooling; // a queue to hold tasks that need to cool down before they can be used again
     // pair = {remaining_freq, time_when_available}
 
-	
+
     int Intervals = 0;
 
-    while (!maxFreq.empty() || !cooling.empty()) { 
+    while (!maxFreq.empty() || !cooling.empty()) {
         Intervals++;
 
         if (!maxFreq.empty()) {
             int f = maxFreq.top();
             maxFreq.pop(); //O(logn)
 
-            f--;  // execute task one time 
+            f--;  // execute task one time
 
             if (f > 0) {
                 cooling.push({ f, Intervals + n }); // push to the cooling queue and say that it will be ready after n intervals
             }
         }
 
-		if (!cooling.empty() && cooling.front().second == Intervals) { // check if any task has finished cooling down
-			maxFreq.push(cooling.front().first); // push back to max-heap
-			cooling.pop(); //O(logn) remove it from cooling queue
+        if (!cooling.empty() && cooling.front().second == Intervals) { // check if any task has finished cooling down
+            maxFreq.push(cooling.front().first); // push back to max-heap
+            cooling.pop(); //O(logn) remove it from cooling queue
         }
     }
 
@@ -868,15 +853,15 @@ int ServerKernel::minIntervals(vector<char>& tasks, int n) {
 // =========================================================
 
 extern "C" {
-    PlayerTable* createPlayerTable() { 
-        return new ConcretePlayerTable(); 
-    }
+PlayerTable* createPlayerTable() {
+    return new ConcretePlayerTable();
+}
 
-    Leaderboard* createLeaderboard() { 
-        return new ConcreteLeaderboard(); 
-    }
+Leaderboard* createLeaderboard() {
+    return new ConcreteLeaderboard();
+}
 
-    AuctionTree* createAuctionTree() { 
-        return new ConcreteAuctionTree(); 
-    }
+AuctionTree* createAuctionTree() {
+    return new ConcreteAuctionTree();
+}
 }
