@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-main_test_students",
+      "appliesTo": "main_test_students.cpp",
+      "type": "launch"
+    }
+  ]
+}
