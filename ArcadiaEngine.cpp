@@ -595,9 +595,9 @@ bool dfs(int start, vector<bool> &visited, vector<vector<int>> &adj, int dest)
         return true;
     for (int i = 0; i < adj[start].size(); i++)
     {
-        if (adj[start][i] == 1 && (!visited[i]))
+        if ((!visited[adj[start][i]]))
         {
-            if (dfs(i, visited, adj, dest))
+            if (dfs(adj[start][i], visited, adj, dest))
                 return true;
         }
     }
@@ -605,9 +605,9 @@ bool dfs(int start, vector<bool> &visited, vector<vector<int>> &adj, int dest)
 }
 bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
     vector<bool> visited(n, false);
-    vector<vector<int>> tmp = vector<vector<int>>(n, vector<int>(n, 0));
-    for (int i = 0; i < edges.size(); ++i) {
-        tmp[edges[i][0]][edges[i][1]] = 1;
+    vector<vector<int>> tmp = vector<vector<int>>(n, vector<int>(0, 0));
+    for (auto & edge : edges) {
+        tmp[edge[0]].push_back(edge[1]);
     }
 
     return dfs(source, visited, tmp, dest);
