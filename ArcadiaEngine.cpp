@@ -533,37 +533,19 @@ int InventorySystem::optimizeLootSplit(int n, vector<int>& coins) {
 int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
     int size_items = items.size();
     vector<vector<int>> V(size_items + 1, vector<int>(capacity + 1, 0)); // DP table
-    vector<vector<int>> P(size_items + 1, vector<int>(capacity + 1, 0)); // To track selected items
 
     // Fill DP table
     for (int i = 1; i <= size_items; i++) {  // i is item index
-        int weight = items[i-1].first;
-        int value = items[i-1].second;
+        int weight = items[i-1].first; // weight of current item
+        int value = items[i-1].second; // value of current item
         for (int j = 1; j <= capacity; j++) {  // j is current capacity
             if (weight <= j && value + V[i-1][j - weight] > V[i-1][j]) {
                 V[i][j] = value + V[i-1][j - weight];
-                P[i][j] = j - weight;
-            } else {
-                V[i][j] = V[i-1][j];
-                P[i][j] = j;
-            }
+            } 
+            else V[i][j] = V[i-1][j];
         }
     }
-
-    // Backtracking to print selected items
-    int j = capacity;
-    vector<int> selectedItems;
-    for (int i = size_items; i >= 1; i--) {
-        if (P[i][j] != j) { // item i-1 was included
-            selectedItems.push_back(i-1);
-            j = P[i][j];
-        }
-    }
-
-    /*cout << "Selected item num: ";
-    for (int num : selectedItems) cout << num + 1 << " ";
-    cout << endl;*/
-
+    
     return V[size_items][capacity];
 }
 
