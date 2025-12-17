@@ -588,27 +588,49 @@ long long InventorySystem::countStringPossibilities(string s) {
 // PART C: WORLD NAVIGATOR (Graphs)
 // =========================================================
 
-bool dfs(int start, vector<bool> &visited, vector<vector<int>> &adj, int dest)
+bool dfs(int start, vector<bool>& visited,
+    vector<vector<int>>& adj, int dest)
 {
+    if (start < 0 || start >= adj.size())
+        return false;
+
+    if (visited[start])
+        return false;
+
     visited[start] = true;
+
     if (start == dest)
         return true;
-    for (int i = 0; i < adj[start].size(); i++)
-    {
-        if ((!visited[adj[start][i]]))
-        {
-            if (dfs(adj[start][i], visited, adj, dest))
+
+    for (int v : adj[start]) {
+        if (!visited[v]) {
+            if (dfs(v, visited, adj, dest))
                 return true;
         }
     }
     return false;
 }
+
 bool WorldNavigator::pathExists(int n, vector<vector<int>>& edges, int source, int dest) {
+    if (n <= 0)
+        return false;
+
+    if (source < 0 || source >= n || dest < 0 || dest >= n)
+        return false;
+
     vector<bool> visited(n, false);
     vector<vector<int>> tmp = vector<vector<int>>(n, vector<int>(0, 0));
-    for (auto & edge : edges) {
-        tmp[edge[0]].push_back(edge[1]);
+    for (auto& edge : edges) {
+        if (edge.size() < 2)
+            continue;
+
+        int u = edge[0];
+        int v = edge[1];
+
+        if (u >= 0 && u < n && v >= 0 && v < n)
+            tmp[u].push_back(v);
     }
+
 
     return dfs(source, visited, tmp, dest);
 }

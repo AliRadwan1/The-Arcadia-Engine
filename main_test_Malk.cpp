@@ -664,5 +664,7 @@ int main() {
 
     runner.printSummary();
 
+    cin.get();
+
     return 0;
 }
