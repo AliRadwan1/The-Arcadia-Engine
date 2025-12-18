@@ -729,6 +729,7 @@ void initialize_distance_matrix(vector<vector<long long>>& D, const vector<vecto
     {
         int u = r[0], v = r[1], d = r[2];
         D[u][v] = d;
+        D[v][u] = d;
     }
 }
 // Floyd-Warshall algorithm
