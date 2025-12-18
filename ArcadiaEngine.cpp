@@ -553,7 +553,7 @@ long long InventorySystem::countStringPossibilities(string s) {
     if (s.size() < 2)
         return 1;
     for (int i = 0; i < s.size(); ++i) {
-        if (s[i] != 'u' && s[i] != 'w') return 0;
+        if (s[i] != 'u' && s[i] != 'n') return 0;
     }
     long long dp1=1,dp2=1,current=1;
     for (int i = 1; i < s.size(); i++)
