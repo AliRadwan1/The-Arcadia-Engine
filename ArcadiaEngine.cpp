@@ -541,17 +541,20 @@ int InventorySystem::maximizeCarryValue(int capacity, vector<pair<int, int>>& it
         for (int j = 1; j <= capacity; j++) {  // j is current capacity
             if (weight <= j && value + V[i-1][j - weight] > V[i-1][j]) {
                 V[i][j] = value + V[i-1][j - weight];
-            } 
+            }
             else V[i][j] = V[i-1][j];
         }
     }
-    
+
     return V[size_items][capacity];
 }
 
 long long InventorySystem::countStringPossibilities(string s) {
     if (s.size() < 2)
         return 1;
+    for (int i = 0; i < s.size(); ++i) {
+        if (s[i] != 'u' && s[i] != 'w') return 0;
+    }
     long long dp1=1,dp2=1,current=1;
     for (int i = 1; i < s.size(); i++)
     {
@@ -571,7 +574,7 @@ long long InventorySystem::countStringPossibilities(string s) {
 // =========================================================
 
 bool dfs(int start, vector<bool>& visited,
-    vector<vector<int>>& adj, int dest)
+         vector<vector<int>>& adj, int dest)
 {
     if (start < 0 || start >= adj.size())
         return false;
