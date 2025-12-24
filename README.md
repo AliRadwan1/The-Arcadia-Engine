@@ -82,13 +82,13 @@ The-Arcadia-Engine/
 
 | Subsystem      | Algorithm                                    | Complexity         |
 | -------------- | -------------------------------------------- | ------------------ |
-| Hash Table     | Mid-square / Multiplication + Double Hashing | O(1) avg           |
+| Hash Table     | Division + Double Hashing                    | O(1) avg           |
 | Skip List      | Randomized multilevel list                   | O(log n)           |
 | Red-Black Tree | Self-balancing BST                           | O(log n)           |
 | Loot Split     | Subset-sum DP                                | O(n × sum)         |
 | Knapsack       | 0/1 DP                                       | O(n × W)           |
 | String DP      | Linear transitions                           | O(n)               |
-| Path Existence | BFS/DFS                                      | O(V + E)           |
+| Path Existence | DFS                                          | O(V + E)           |
 | MST            | Kruskal                                      | O(E log V)         |
 | APSP           | Floyd–Warshall                               | O(V³)              |
 | Scheduler      | Greedy max-frequency                         | O(n) or O(n log n) |
