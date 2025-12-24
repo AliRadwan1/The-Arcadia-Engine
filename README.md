@@ -22,8 +22,8 @@ The **Arcadia Engine** is a modular library consisting of four major subsystems:
 
 3. **Navigator** – World traversal and safety algorithms:
 
-   - Path existence (BFS/DFS)
-   - Minimum bribe MST (Kruskal/Prim)
+   - Path existence (DFS)
+   - Minimum bribe MST (Kruskal)
    - All-pairs shortest path (Floyd–Warshall)
 
 4. **Kernel** – Server task scheduling:
